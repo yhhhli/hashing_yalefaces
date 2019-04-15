@@ -8,9 +8,7 @@
 
 算法使用HashNet解决gradient mismatch问题，用Deep Cauchy Hashing来定义损失函数，并且量化损失由于HashNet的存在是可以抛弃的：
 
-![image-20190227170039933](/Users/liyuhang/Documents/GitHub/hashing_yalefaces/figs/hashnet-ills.png)
 
-![image-20190227170052581](/Users/liyuhang/Library/Application%20Support/typora-user-images/image-20190227170052581.png)
 
 可以提升的点：
 
