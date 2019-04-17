@@ -9,10 +9,9 @@ def hashing(x, inference, beta):
         x = (beta * x).tanh()
     return x
 
+
 def loss(x):
-
-
-
+    pass
 
 
 class LeNet(nn.Module):
@@ -41,3 +40,6 @@ class LeNet(nn.Module):
         x = self.linear(x)
         x = hashing(x, self.inference, self.beta)
         return x
+
+    def beta_schedule(self):
+        self.beta = self.beta + 0.2
