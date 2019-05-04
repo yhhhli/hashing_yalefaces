@@ -33,7 +33,7 @@ $ python main.py
  The trained hash codes also have been provided. To do the evaluation:
 
 ```bash
-$ cd <Repository Root>/MNIST/
+$ cd <Repository Root>/yuhang
 $ python main.py --evaluate
 ```
 
