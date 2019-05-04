@@ -133,7 +133,7 @@ if __name__ == '__main__':
     optimizer = torch.optim.SGD(model.parameters(), args.lr, weight_decay=args.weight_decay, momentum=args.momentum)
 
     if args.evaluate:
-        pass
+        evaluate()
         exit(0)
 
     # start training

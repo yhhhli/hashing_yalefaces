@@ -81,7 +81,7 @@ class AlexNet(nn.Module):
         )
         self.linear = nn.Sequential(
             nn.Linear(512*3*3, 1024),
-            nn.Linear(1000, self.bit_num)
+            nn.Linear(1024, self.bit_num)
         )
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
