@@ -23,9 +23,19 @@ This will generate two npz files. These two npz files also have been stored in t
 
 ### HashNet
 
+We use LeNet-5 structure with more channels to learn the hash codes. To run the training:
 
+```bash
+$ cd <Repository Root>/yuhang
+$ python main.py 
+```
 
- 
+ The trained hash codes also have been provided. To do the evaluation:
+
+```bash
+$ cd <Repository Root>/MNIST/
+$ python main.py --evaluate
+```
 
 
 
