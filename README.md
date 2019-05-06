@@ -4,9 +4,10 @@ This work tries to retrieve [yalefaces](http://vision.ucsd.edu/content/yale-face
 
 ### Results
 
-| Method  | Bits Number | Precision |
-| ------- | ----------- | --------- |
-| HashNet | 32          | 100%      |
+| Method  | Bits Number | mean Average Precision |
+| ------- | ----------- | ---------------------- |
+| HashNet | 32          | 100%                   |
+| HashNet | 16          | 96.88%                 |
 
 ### Dataset
 
@@ -28,6 +29,13 @@ We use LeNet-5 structure with more channels to learn the hash codes. To run the 
 ```bash
 $ cd <Repository Root>/yuhang
 $ python main.py 
+```
+
+Trainning 16 bits hash codes need to adjust some hyper parameter:
+
+```
+$ cd <Repository Root>/yuhang
+$ python main.py --bitnum 16 --alpha 0.9 --lr 1e-4
 ```
 
  The trained hash codes also have been provided. To do the evaluation:

@@ -10,6 +10,25 @@ from model import LeNet, AlexNet, hash_loss, beta_schedule
 from torch.autograd import Variable
 
 
+class AverageMeter(object):
+    """Computes and stores the average and current value"""
+
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        self.val = val
+        self.sum += val * n
+        self.count += n
+        self.avg = self.sum / self.count
+
+
 def save_hashcodes(model):
     model.inference = True
     if args.cpu:
@@ -18,7 +37,7 @@ def save_hashcodes(model):
     else:
         output = model(input.cuda()).detach().cpu().numpy()
         test_output = model(test_input.cuda()).detach().cpu().numpy()
-    np.savez('hashing_code.npz', output=output, test_output=test_output)
+    np.savez('hashing_code_'+str(args.bitnum)+'.npz', output=output, test_output=test_output)
     print('Hashing codes have been saved!')
 
 
@@ -31,7 +50,7 @@ def train(epoch, input, sim_mat, wgt_mat):
     optimizer.zero_grad()
     output = model(input)
 
-    loss = criterion(output, sim_mat, wgt_mat)
+    loss = criterion(output, sim_mat, wgt_mat, args.alpha)
     loss.backward()
     optimizer.step()
 
@@ -41,26 +60,38 @@ def train(epoch, input, sim_mat, wgt_mat):
                                                          optimizer.param_groups[0]['lr']))
 
 
+def mAP(index):
+    meanAveragePrec = AverageMeter()
+    for i in range(30):
+        Prec = AverageMeter()
+        AveragePrec = AverageMeter()
+        count = 0
+        for j in range(135):
+            if i // 2 == index[i][134 - j] // 9:
+                Prec.update(1.0)
+                AveragePrec.update(Prec.avg)
+                count += 1
+            else:
+                Prec.update(0.0)
+            if count == 9:
+                break
+        meanAveragePrec.update(AveragePrec.avg)
+    return meanAveragePrec.avg
+
+
 def evaluate():
-    npzf = np.load('hashing_code.npz')
+    npzf = np.load('hashing_code_'+str(args.bitnum)+'.npz')
     output, test_output = npzf['output'], npzf['test_output']
     inner_product = np.matmul(test_output, output.transpose())
-    inner_product = np.argsort(inner_product, axis=1)
-    print(inner_product)
+    index = np.argsort(inner_product, axis=1)
+    print(index)
 
-    correct = 0
-    for i in range(30):
-        for j in range(9):
-            if i // 2 == inner_product[i][134 - j] // 9:
-                correct += 1
-            else:
-                print('wrong coords:' + str(i) + ', ' + str(134 - j))
-    correct = correct / 270
-    print('Precision: {}'.format(correct))
+    MAP = mAP(index)
+    print('mean Average Precision: {}'.format(MAP))
 
 
 def adjust_learning_rate(optimizer, epoch):
-    update_list = [1200, 2000, 2500]
+    update_list = [2000, 2500]
     if epoch in update_list:
         for param_group in optimizer.param_groups:
             param_group['lr'] = param_group['lr'] * 0.2
@@ -89,8 +120,10 @@ if __name__ == '__main__':
                         help='evaluate the model')
     parser.add_argument('--bitnum', action='store', default=32, type=int,
                         help='the bit numbers of hashing codes')
-    parser.add_argument('--end-beta', action='store', default=1.0, type=int,
+    parser.add_argument('--end-beta', action='store', default=1.0, type=float,
                         help='the end of the beta')
+    parser.add_argument('--alpha', action='store', default=1.0, type=float,
+                        help='control the shape of loss')
 
     args = parser.parse_args()
     print('==> Options:', args)
@@ -142,3 +175,4 @@ if __name__ == '__main__':
         train(epoch, input, sim_mat, wgt_mat)
     save_hashcodes(model)
     evaluate()
+
