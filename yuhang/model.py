@@ -10,8 +10,8 @@ def hashing(x, inference, beta):
     return x
 
 
-def hash_loss(output, sim_mat, wgt_mat):
-    inner_product = torch.mm(output, output.t())
+def hash_loss(output, sim_mat, wgt_mat, alpha=1.0):
+    inner_product = torch.mm(output, output.t()).mul(alpha)
     return wgt_mat.mul(inner_product.exp().add(1.).log() - sim_mat.mul(inner_product)).mean()
 
 
