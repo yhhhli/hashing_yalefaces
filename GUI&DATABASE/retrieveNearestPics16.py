@@ -5,10 +5,16 @@ import pymysql
 def fun(absoluteFilePath,host,user,password):
 	db = pymysql.connect(host, user, password, "yalefaces_database")
 	cursor = db.cursor()
-	if(len(absoluteFilePath)>=6 and(absoluteFilePath[-6]=='s' or absoluteFilePath[-6]=='t')):
-		segment=-6
-	elif(len(absoluteFilePath)>=7 and (absoluteFilePath[-7]=='s'or absoluteFilePath[-7]=='t')):
-		segment=-7
+	last_p = -1
+	llast_p = -1
+	while True:
+		position = absoluteFilePath.find('\\', last_p + 1)
+		if position == -1:
+			break
+		llast_p = last_p
+		last_p = position
+	segment = last_p + 1
+	segment2 = llast_p + 1
 	s=absoluteFilePath[segment:]
 	if(s[0]=='s'):
 		select_sql="SELECT HASH_CODE FROM TRAIN_DATASET16 WHERE FILE_NAME = '%s'" %s
@@ -43,7 +49,7 @@ def fun(absoluteFilePath,host,user,password):
 	index=np.argsort(dis)
 	list=[]
 	for i in range(9):
-		list.append(absoluteFilePath[0:segment]+"s"+str(index[index.shape[0]-1-i]+1)+".bmp")
+		list.append(absoluteFilePath[0:segment2]+"traindata\\""s"+str(index[index.shape[0]-1-i]+1)+".bmp")
 	return list
 
 if __name__=='__main__':
